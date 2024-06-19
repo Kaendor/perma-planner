@@ -10,7 +10,16 @@ impl CartoClient {
         CartoClient {}
     }
 
-    pub fn get_commune(code_insee: &str) -> Result<GeoJson> {
+    pub fn get_commune_svg(code_insee: &str) -> Result<String> {
+        let json = CartoClient::get_commune(code_insee)?;
+        let svg = CartoClient::json_to_svg(json)?;
+
+        dbg!(&svg);
+
+        Ok(svg)
+    }
+
+    fn get_commune(code_insee: &str) -> Result<GeoJson> {
         let url = format!(
             "https://apicarto.ign.fr/api/cadastre/commune?code_insee={}",
             code_insee
@@ -21,9 +30,9 @@ impl CartoClient {
         Ok(map)
     }
 
-    pub fn json_to_svg(json: GeoJson) -> Result<String> {
+    fn json_to_svg(json: GeoJson) -> Result<String> {
         let string = json.to_string();
-        let svg = GeoJsonString(string).to_svg()?;
+        let svg = GeoJsonString(string).to_svg_document()?;
 
         Ok(svg)
     }
